@@ -10,8 +10,9 @@
 #define WATERARM_MID 1000
 #define WATERARM_UP 2000
 #define POMARM 1
-#define POMARM_UP 1000
-#define POMARM_DOWN 2000
+#define POMARM_UP 800
+#define POMARM_MID 1400
+#define POMARM_DOWN 1500
 
 
 #define FULL_REVOLUTION 3200
@@ -84,11 +85,21 @@ void shake(int counts) {
     }
 }
 
+void move_under_pipe(int speed) {
+  double start = seconds();
+  double curr;
+  for(curr = start; analog(0)>2500 && curr - start < 5; curr = seconds()) {
+    controller.mav(controller.motor_right, speed);
+    controller.mav(controller.motor_left, speed);
+  }
+  ao();
+}
+
 void watertank_one() {
   	//empty water tank by moving water arm up and driving backwards
   	msleep(500);
-  	controller.mav(controller.motor_right, 100);
-  	controller.mav(controller.motor_left, 100);
+  	//controller.mav(controller.motor_right, 100);
+  	//controller.mav(controller.motor_left, 100);
   	controller.slow_servo(WATERARM, WATERARM_MID, 2);
   	controller.mav(controller.motor_right, 200);
   	controller.mav(controller.motor_left, 200);
@@ -106,20 +117,24 @@ void watertank_one() {
 
 void watertank_two() {
   	//empty water tank by moving water arm up and driving backwards
+    move_under_pipe(-300);
   	msleep(500);
-  	//controller.mav(controller.motor_right, -50);
+    controller.mav(controller.motor_right, 200);
+    controller.mav(controller.motor_left, 200);
+    msleep(2750);
+    ao();
+    msleep(500);
+ 	//controller.mav(controller.motor_right, -50);
   	//controller.mav(controller.motor_left, -50);
   	controller.slow_servo(WATERARM, WATERARM_MID, 2);
-  	controller.mav(controller.motor_right, -200);
-  	controller.mav(controller.motor_left, -200);
+  	controller.mav(controller.motor_right, -250);
+  	controller.mav(controller.motor_left, -250);
   	controller.slow_servo(WATERARM, WATERARM_UP, 3.5);
   	msleep(500);
   	ao();
   	shake(10);
 
   	//lower water arm
-  	controller.mav(controller.motor_right, 200);
-  	controller.mav(controller.motor_left, 200);
   	controller.slow_servo(WATERARM, WATERARM_DOWN, 4);
   	ao();
 }
@@ -146,7 +161,7 @@ void rotate_two_one(){
   	controller.servo(WATERARM, WATERARM_DOWN);	//get over side of robot
   	base_rotate(0.25, 300);	//POSITION: 0.50
   	controller.servo(WATERARM, WATERARM_LOWEST);
-  	mav_forward(-550, 2100);
+  	//mav_forward(-550, 2100);
 }
 
 void bored(){
@@ -201,10 +216,14 @@ int main()
     */
   
   	enable_servos();
-  	
-  	set_servo_position(POMARM, POMARM_UP);
+  	/*
+  	set_servo_position(POMARM, POMARM_DOWN);
   	msleep(250);
-  	controller.backward(15, 50);//square up against pipe
+  	controller.forward(7, 20);
+  	msleep(250);
+  	controller.slow_servo(POMARM, POMARM_UP, 2.5);
+  	msleep(250);
+  	controller.backward(30, 50);//square up against pipe
   	msleep(250);
   	turn_right_in_place(1000, 600); // doge create
   
@@ -214,16 +233,22 @@ int main()
   	
   	turn_left_in_place(1000, 300);
   	msleep(250);
-  	controller.forward(6, 50);
+  	controller.forward(10, 50);
   	msleep(250);
   	turn_left_in_place(1000, 780);
   	msleep(250);
-  	controller.backward(15, 50);//square up against vertical pipe
+  	controller.backward(20, 50);//square up against vertical pipe
   	msleep(250);
   	controller.forward(100, 80);
   	msleep(250);
+  	set_servo_position(POMARM, POMARM_MID);
+  	controller.backward(3, 20);
+  	msleep(250);
+  	set_servo_position(POMARM, POMARM_UP);
+  	msleep(250);
   	set_servo_position(POMARM, POMARM_DOWN);
-  	controller.backward(13, 50);
+  	msleep(250);
+  	controller.backward(10, 20);
   	msleep(250);
   	set_servo_position(POMARM, POMARM_UP);
   	turn_right_in_place(1000, 780);
@@ -235,7 +260,7 @@ int main()
   	turn_right_in_place(1000, 850);
   	msleep(250);
   	controller.backward(80, 50);
-  	msleep(250);
+  	msleep(250);*/
   
   	controller.forward(19, 50);
   	msleep(250);
